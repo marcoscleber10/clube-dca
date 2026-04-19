@@ -1,135 +1,704 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clube DCA - Dashboard</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #333;
-      padding: 16px;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    }
-    header {
-      text-align: center;
-      padding: 20px 0;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #667eea;
-      font-size: 1.5rem;
-    }
-    .subtitle {
-      color: #666;
-      font-size: 0.9rem;
-      margin-top: 4px;
-    }
-    .card {
-      background: #f8f9fa;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border-left: 4px solid #667eea;
-    }
-    .card h3 {
-      color: #555;
-      font-size: 1rem;
-      margin-bottom: 8px;
-    }
-    .value {
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #2d3748;
-    }
-    .positive { color: #22c55e; }
-    .negative { color: #ef4444; }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 600px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      background: #667eea;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    .btn:active { background: #5568d3; }
-    footer {
-      text-align: center;
-      color: #888;
-      font-size: 0.8rem;
-      margin-top: 24px;
-      padding-top: 16px;
-      border-top: 1px solid #eee;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clube DCA - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #1a1f3a 0%, #0f1429 100%);
+            border-right: 1px solid #2a3152;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 30px;
+            border-bottom: 1px solid #2a3152;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            color: #0a0e27;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .logo-subtitle {
+            font-size: 10px;
+            color: #8892b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin: 4px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #8892b0;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(247, 147, 26, 0.1);
+            color: #f7931a;
+            border-left: 3px solid #f7931a;
+        }
+
+        .nav-icon {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 20px 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a3152;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btc-price-badge {
+            background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%);
+            color: #0a0e27;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%);
+            color: #0a0e27;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1429 100%);
+            border: 1px solid #2a3152;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #f7931a, #ffab40);
+        }
+
+        .card.total-investido::before { background: linear-gradient(90deg, #00d4aa, #00ffcc); }
+        .card.btc-acumulado::before { background: linear-gradient(90deg, #f7931a, #ffab40); }
+        .card.valor-atual::before { background: linear-gradient(90deg, #00d4aa, #00ffcc); }
+        .card.preco-medio::before { background: linear-gradient(90deg, #4a90e2, #67b8ff); }
+        .card.lucro-prejuizo::before { background: linear-gradient(90deg, #ff4757, #ff6b7a); }
+        .card.btc-agora::before { background: linear-gradient(90deg, #f7931a, #ffab40); }
+
+        .card-label {
+            font-size: 12px;
+            color: #8892b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #8892b0;
+        }
+
+        .positive {
+            color: #00d4aa;
+        }
+
+        .negative {
+            color: #ff4757;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1429 100%);
+            border: 1px solid #2a3152;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .chart-subtitle {
+            font-size: 12px;
+            color: #8892b0;
+            margin-bottom: 20px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-box {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1429 100%);
+            border: 1px solid #2a3152;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .chart-box-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btc-icon { color: #f7931a; }
+        .eth-icon { color: #627eea; }
+        .sol-icon { color: #00ffa3; }
+
+        .chart-box-small {
+            height: 200px;
+        }
+
+        .btn-update {
+            background: rgba(247, 147, 26, 0.1);
+            border: 1px solid #f7931a;
+            color: #f7931a;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #8892b0;
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            background: transparent;
+            border: 1px dashed #f7931a;
+            color: #f7931a;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>📊 Clube DCA</h1>
-      <p class="subtitle">Acompanhe seus investimentos em cripto</p>
-    </header>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">₿</div>
+                <div class="logo-text">
+                    <div class="logo-title">Clube DCA</div>
+                    <div class="logo-subtitle">Bitcoin DCA Tracker</div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">+</span>
+                        Compras
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">📈</span>
+                        Analise
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">💎</span>
+                        Vitrine
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Admin
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">$</span>
+                        Cotacao BTC / Taxas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">📡</span>
+                        Sinais e DeFi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">❤️</span>
+                        Apoiar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">💰</span>
+                        PrecoJusto
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">🏊</span>
+                        Pools / DeFi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">📺</span>
+                        Streaming
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <span class="nav-icon">⭐</span>
+                        Carteira 2030
+                    </a>
+                </li>
+            </ul>
+        </aside>
 
-    <div class="grid">
-      <div class="card">
-        <h3>💰 Saldo Total</h3>
-        <p class="value">R$ 12.450,80</p>
-      </div>
-      <div class="card">
-        <h3>📈 Variação 24h</h3>
-        <p class="value positive">+2,34%</p>
-      </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1 class="header-title">Dashboard</h1>
+                <div class="header-actions">
+                    <div class="btc-price-badge">BTC R$ 377.185,00</div>
+                    <button class="btn-primary">+ Registrar DCA</button>
+                </div>
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="cards-grid">
+                <div class="card total-investido">
+                    <div class="card-label">Total Investido</div>
+                    <div class="card-value">R$ 600,00</div>
+                    <div class="card-subtitle">4 compras</div>
+                </div>
+
+                <div class="card btc-acumulado">
+                    <div class="card-label">BTC Acumulado</div>
+                    <div class="card-value" style="color: #f7931a;">83.788 sats</div>
+                    <div class="card-subtitle">0.00083788 BTC</div>
+                </div>
+
+                <div class="card valor-atual">
+                    <div class="card-label">Valor Atual</div>
+                    <div class="card-value">R$ 316,04</div>
+                    <div class="card-subtitle">$ 63,49</div>
+                </div>
+
+                <div class="card preco-medio">
+                    <div class="card-label">Preco Medio de Compra</div>
+                    <div class="card-value">R$ 716.093,00</div>
+                    <div class="card-subtitle">BTC agora: R$ 377.185,00</div>
+                </div>
+
+                <div class="card lucro-prejuizo">
+                    <div class="card-label">Lucro / Prejuizo</div>
+                    <div class="card-value negative">R$ -283,96</div>
+                    <div class="card-subtitle negative">-47.33%</div>
+                </div>
+
+                <div class="card btc-agora">
+                    <div class="card-label">$ BTC Agora (USD)</div>
+                    <div class="card-value">$ 75,770.39</div>
+                    <div class="card-subtitle">USD/BRL: R$ 4,98</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-container">
+                    <div class="chart-title">📈 Curva de Equity</div>
+                    <div class="chart-subtitle">Valor do portfolio vs Total investido</div>
+                    <div class="chart-wrapper">
+                        <canvas id="equityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-box">
+                        <div class="chart-box-title">
+                            <span class="btc-icon">₿</span>
+                            Acumulo BTC
+                        </div>
+                        <div class="chart-subtitle">Sats acumulados mes a mes</div>
+                        <div class="chart-box-small">
+                            <canvas id="btcChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-box">
+                        <div class="chart-box-title">
+                            📊 Resultado Mensal
+                        </div>
+                        <div class="chart-subtitle">Lucro/Prejuizo por mes (BRL)</div>
+                        <div style="text-align: right; margin-bottom: 10px;">
+                            <button class="btn-update">Todos</button>
+                        </div>
+                        <div class="chart-box-small">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container" style="margin-top: 20px;">
+                    <div class="chart-title">📊 TWR — Retorno Ponderado pelo Tempo</div>
+                    <div class="chart-subtitle">% retorno mensal (barras) + TWR acumulado (linha)</div>
+                    <div style="text-align: right; margin-bottom: 15px;">
+                        <button class="btn-update">Todos</button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="twrChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="charts-grid" style="margin-top: 20px;">
+                    <div class="chart-box">
+                        <div class="chart-box-title">
+                            <span class="eth-icon">Ξ</span>
+                            Acumulo ETH
+                        </div>
+                        <div class="chart-subtitle">ETH acumulado mes a mes</div>
+                        <div style="text-align: right; margin-bottom: 10px;">
+                            <button class="btn-update">Atualizar</button>
+                        </div>
+                        <div class="empty-state">
+                            <p>Registre compras com ativo ETH para ver o grafico</p>
+                            <button class="btn-add">+ ETH</button>
+                        </div>
+                    </div>
+
+                    <div class="chart-box">
+                        <div class="chart-box-title">
+                            <span class="sol-icon">◎</span>
+                            Acumulo SOL
+                        </div>
+                        <div class="chart-subtitle">SOL acumulado mes a mes</div>
+                        <div style="text-align: right; margin-bottom: 10px;">
+                            <button class="btn-update">Atualizar</button>
+                        </div>
+                        <div class="empty-state">
+                            <p>Registre compras com ativo SOL para ver o grafico</p>
+                            <button class="btn-add">+ SOL</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <div class="card">
-      <h3>🪙 Ativos</h3>
-      <p><strong>BTC:</strong> 0.15234 <span class="positive">+1,2%</span></p>
-      <p><strong>ETH:</strong> 2.4510 <span class="positive">+3,1%</span></p>
-      <p><strong>BRZ:</strong> 5.200,00 <span class="negative">-0,4%</span></p>
-    </div>
+    <script>
+        // Chart.js default config
+        Chart.defaults.color = '#8892b0';
+        Chart.defaults.borderColor = '#2a3152';
 
-    <div class="card">
-      <h3>🎯 Próximo DCA</h3>
-      <p class="value" style="font-size:1.1rem">15 de Maio • R$ 500,00</p>
-    </div>
+        // Equity Chart
+        const equityCtx = document.getElementById('equityChart').getContext('2d');
+        const equityGradient = equityCtx.createLinearGradient(0, 0, 0, 300);
+        equityGradient.addColorStop(0, 'rgba(247, 147, 26, 0.3)');
+        equityGradient.addColorStop(1, 'rgba(247, 147, 26, 0.0)');
 
-    <button class="btn" onclick="alert('Funcionalidade em desenvolvimento!')">
-      ➕ Adicionar Nova Compra
-    </button>
+        const equityGradient2 = equityCtx.createLinearGradient(0, 0, 0, 300);
+        equityGradient2.addColorStop(0, 'rgba(0, 212, 170, 0.3)');
+        equityGradient2.addColorStop(1, 'rgba(0, 212, 170, 0.0)');
 
-    <footer>
-      <p>Clube DCA © 2026 • Invista com consistência</p>
-    </footer>
-  </div>
+        new Chart(equityCtx, {
+            type: 'line',
+            data: {
+                labels: ['03-07', '10-16', '10-17', '01-07'],
+                datasets: [{
+                    label: 'Valor do Portfolio',
+                    data: [200, 210, 250, 316],
+                    borderColor: '#00d4aa',
+                    backgroundColor: equityGradient2,
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Total Investido',
+                    data: [200, 300, 450, 600],
+                    borderColor: '#f7931a',
+                    backgroundColor: equityGradient,
+                    borderDash: [5, 5],
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
-  <script>
-    // Exemplo: Atualizar valores dinamicamente
-    console.log('Dashboard carregado!');
-    // Aqui você pode integrar com APIs de cotação depois
-  </script>
+        // BTC Accumulation Chart
+        const btcCtx = document.getElementById('btcChart').getContext('2d');
+        new Chart(btcCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mar/25', 'Out/25', 'Mar/26'],
+                datasets: [{
+                    label: 'Sats',
+                    data: [50000, 52000, 83788],
+                    borderColor: '#f7931a',
+                    backgroundColor: 'rgba(247, 147, 26, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Monthly Result Chart
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mar/25', 'Out/25', 'Mar/26'],
+                datasets: [{
+                    label: 'Lucro/Prejuízo',
+                    data: [-50, -150, -283.96],
+                    backgroundColor: '#ff4757'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // TWR Chart
+        const twrCtx = document.getElementById('twrChart').getContext('2d');
+        new Chart(twrCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mar/25', 'Out/25', 'Mar/26'],
+                datasets: [{
+                    type: 'line',
+                    label: 'TWR Acumulado %',
+                    data: [0, -2, 1.5],
+                    borderColor: '#627eea',
+                    tension: 0.4
+                }, {
+                    type: 'bar',
+                    label: 'Retorno mensal %',
+                    data: [0, -2, 3.5],
+                    backgroundColor: (context) => {
+                        const value = context.raw;
+                        return value >= 0 ? '#00d4aa' : '#ff4757';
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
