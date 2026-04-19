@@ -3,732 +3,133 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simulador HODL - Clube DCA</title>
-  
-  <!-- Chart.js (versão estável) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  
+  <title>Clube DCA - Dashboard</title>
   <style>
-    /* ===== ESTILOS DO SIMULADOR HODL - Isolados com prefixo ===== */
-    #tab-simulador-hodl {
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      max-width: 1200px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      padding: 16px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
       margin: 0 auto;
-      padding: 16px;
-      color: #e0e0e0;
-      background: #0f0f12;
-      border-radius: 12px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
-    #tab-simulador-hodl * { box-sizing: border-box; }
-    
-    #tab-simulador-hodl .hodl-header {
+    header {
       text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
       margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #2a2a3a;
     }
-    #tab-simulador-hodl .hodl-header h2 {
-      font-size: 1.6rem;
-      margin: 0;
-      color: #f7931a;
+    h1 {
+      color: #667eea;
+      font-size: 1.5rem;
     }
-    #tab-simulador-hodl .hodl-header p {
-      color: #999;
-      margin: 6px 0 0;
+    .subtitle {
+      color: #666;
       font-size: 0.9rem;
+      margin-top: 4px;
     }
-
-    #tab-simulador-hodl .hodl-controls {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      background: #1a1a24;
+    .card {
+      background: #f8f9fa;
+      border-radius: 12px;
       padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      border-left: 4px solid #667eea;
     }
-    #tab-simulador-hodl .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    .card h3 {
+      color: #555;
+      font-size: 1rem;
+      margin-bottom: 8px;
     }
-    #tab-simulador-hodl .control-group label {
-      font-size: 0.8rem;
-      color: #bbb;
+    .value {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #2d3748;
     }
-    #tab-simulador-hodl .control-group input,
-    #tab-simulador-hodl .control-group select {
-      padding: 8px 10px;
-      border: 1px solid #3a3a52;
-      border-radius: 6px;
-      background: #0f0f15;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
+    .positive { color: #22c55e; }
+    .negative { color: #ef4444; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
-    #tab-simulador-hodl .control-group input:focus,
-    #tab-simulador-hodl .control-group select:focus {
-      border-color: #f7931a;
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
     }
-
-    #tab-simulador-hodl .btn-calcular {
-      grid-column: 1 / -1;
-      background: linear-gradient(135deg, #f7931a, #ffaa33);
-      color: #000;
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #667eea;
+      color: white;
       border: none;
-      padding: 12px;
+      border-radius: 10px;
       font-size: 1rem;
       font-weight: 600;
-      border-radius: 8px;
+      margin-top: 10px;
       cursor: pointer;
     }
-    #tab-simulador-hodl .btn-calcular:hover {
-      box-shadow: 0 4px 15px rgba(247, 147, 26, 0.3);
-    }
-    #tab-simulador-hodl .btn-calcular:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    #tab-simulador-hodl .hodl-results {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    #tab-simulador-hodl .result-card {
-      background: #1a1a24;
-      padding: 12px;
-      border-radius: 8px;
+    .btn:active { background: #5568d3; }
+    footer {
       text-align: center;
-      border: 1px solid #2a2a3a;
-    }
-    #tab-simulador-hodl .result-card .label {
+      color: #888;
       font-size: 0.8rem;
-      color: #aaa;
-      margin-bottom: 4px;
-    }
-    #tab-simulador-hodl .result-card .value {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #fff;
-    }
-    #tab-simulador-hodl .result-card .value.positive { color: #00c853; }
-    #tab-simulador-hodl .result-card .value.negative { color: #ff5252; }
-
-    #tab-simulador-hodl .hodl-chart-container {
-      background: #1a1a24;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 16px;
-      border: 1px solid #2a2a3a;
-      height: 320px;
-    }
-    #tab-simulador-hodl #hodlChart {
-      width: 100%;
-      height: 100%;
-    }
-
-    #tab-simulador-hodl .loading {
-      text-align: center;
-      padding: 24px;
-      color: #aaa;
-      display: none;
-    }
-    #tab-simulador-hodl .loading.active { display: block; }
-    
-    #tab-simulador-hodl .error-msg {
-      background: #2a1a1a;
-      border: 1px solid #ff5252;
-      color: #ff9999;
-      padding: 10px;
-      border-radius: 6px;
-      margin: 12px 0;
-      display: none;
-      font-size: 0.85rem;
-    }
-    #tab-simulador-hodl .error-msg.active { display: block; }
-
-    #tab-simulador-hodl .hodl-footer {
-      text-align: center;
-      color: #666;
-      font-size: 0.8rem;
-      padding-top: 12px;
-      border-top: 1px solid #2a2a3a;
-    }
-
-    @media (max-width: 600px) {
-      #tab-simulador-hodl .hodl-controls {
-        grid-template-columns: 1fr;
-      }
-      #tab-simulador-hodl .hodl-results {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      #tab-simulador-hodl .hodl-chart-container {
-        height: 260px;
-      }
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>📊 Clube DCA</h1>
+      <p class="subtitle">Acompanhe seus investimentos em cripto</p>
+    </header>
 
-  <!-- ===== ABA SIMULADOR HODL - INÍCIO ===== -->
-  <div id="tab-simulador-hodl" class="tab-content">
-    
-    <div class="hodl-header">
-      <h2>🪙 Simulador HODL</h2>
-      <p>Simule DCA em Bitcoin • Rápido e leve</p>
-    </div>
-
-    <div class="hodl-controls">
-      <div class="control-group">
-        <label for="hodl-amount">Aporte</label>
-        <input type="number" id="hodl-amount" min="1" step="any" value="100" />
+    <div class="grid">
+      <div class="card">
+        <h3>💰 Saldo Total</h3>
+        <p class="value">R$ 12.450,80</p>
       </div>
-      <div class="control-group">
-        <label for="hodl-currency">Moeda</label>
-        <select id="hodl-currency">
-          <option value="BRL">BRL (R$)</option>
-          <option value="USD" selected>USD (US$)</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label for="hodl-frequency">Frequência</label>
-        <select id="hodl-frequency">
-          <option value="daily">Diária</option>
-          <option value="weekly" selected>Semanal</option>
-          <option value="biweekly">Quinzenal</option>
-          <option value="monthly">Mensal</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label for="hodl-days">Período</label>
-        <select id="hodl-days">
-          <option value="365">1 ano</option>
-          <option value="730">2 anos</option>
-          <option value="1825" selected>5 anos</option>
-          <option value="3650">10 anos</option>
-        </select>
-      </div>
-      <button class="btn-calcular" id="btn-calcular-hodl">🔍 Calcular</button>
-    </div>
-
-    <div class="error-msg" id="hodl-error"></div>
-    <div class="loading" id="hodl-loading">
-      ⏳ Carregando...
-    </div>
-
-    <div class="hodl-results" id="hodl-results" style="display:none;">
-      <div class="result-card">
-        <div class="label">Investido</div>
-        <div class="value" id="res-invested">R$ 0</div>
-      </div>
-      <div class="result-card">
-        <div class="label">BTC</div>
-        <div class="value" id="res-btc">0</div>
-      </div>
-      <div class="result-card">
-        <div class="label">Atual</div>
-        <div class="value" id="res-current">R$ 0</div>
-      </div>
-      <div class="result-card">
-        <div class="label">ROI</div>
-        <div class="value" id="res-roi">+0%</div>
-      </div>
-      <div class="result-card">
-        <div class="label">Preço Médio</div>
-        <div class="value" id="res-avg-price">R$ 0</div>
-      </div>
-      <div class="result-card">
-        <div class="label">Preço Hoje</div>
-        <div class="value" id="res-current-price">R$ 0</div>
+      <div class="card">
+        <h3>📈 Variação 24h</h3>
+        <p class="value positive">+2,34%</p>
       </div>
     </div>
 
-    <div class="hodl-chart-container">
-      <canvas id="hodlChart"></canvas>
+    <div class="card">
+      <h3>🪙 Ativos</h3>
+      <p><strong>BTC:</strong> 0.15234 <span class="positive">+1,2%</span></p>
+      <p><strong>ETH:</strong> 2.4510 <span class="positive">+3,1%</span></p>
+      <p><strong>BRZ:</strong> 5.200,00 <span class="negative">-0,4%</span></p>
     </div>
 
-    <div class="hodl-footer">
-      <p>💡 CoinGecko API • Cache 6h • Não é recomendação</p>
+    <div class="card">
+      <h3>🎯 Próximo DCA</h3>
+      <p class="value" style="font-size:1.1rem">15 de Maio • R$ 500,00</p>
     </div>
+
+    <button class="btn" onclick="alert('Funcionalidade em desenvolvimento!')">
+      ➕ Adicionar Nova Compra
+    </button>
+
+    <footer>
+      <p>Clube DCA © 2026 • Invista com consistência</p>
+    </footer>
   </div>
-  <!-- ===== FIM ABA ===== -->
 
   <script>
-    /**
-     * SIMULADOR HODL - Clube DCA
-     * VERSÃO VALIDADA E CORRIGIDA
-     * 
-     * ✅ Checklist completo aplicado:
-     * - Sintaxe JavaScript validada
-     * - Chart.js com estrutura correta (data: {})
-     * - Inicialização direta (sem lazy complexo)
-     * - Isolamento total de escopo (IIFE)
-     * - Tratamento de erro seguro (não trava página)
-     */
-
-    (function() {
-      'use strict';
-
-      // ===== CONFIGURAÇÃO =====
-      var CONFIG = {
-        apiBase: 'https://api.coingecko.com/api/v3',
-        coinId: 'bitcoin',
-        storageKey: 'hodl_params_v4',
-        cacheKey: 'hodl_cache_v4',
-        cacheExpiry: 6 * 60 * 60 * 1000,
-        maxChartPoints: 150,
-        chart: null,
-        initialized: false
-      };
-
-      // ===== REFERÊNCIAS DOM =====
-      var els = {};
-
-      // ===== INICIALIZAÇÃO DIRETA E SEGURA =====
-      function init() {
-        if (CONFIG.initialized) return;
-        
-        // Captura elementos
-        els.tab = document.getElementById('tab-simulador-hodl');
-        if (!els.tab) {
-          console.warn('Simulador HODL: div #tab-simulador-hodl não encontrada');
-          return;
-        }
-        
-        els.amount = document.getElementById('hodl-amount');
-        els.currency = document.getElementById('hodl-currency');
-        els.frequency = document.getElementById('hodl-frequency');
-        els.days = document.getElementById('hodl-days');
-        els.btn = document.getElementById('btn-calcular-hodl');
-        els.loading = document.getElementById('hodl-loading');
-        els.error = document.getElementById('hodl-error');
-        els.results = document.getElementById('hodl-results');
-        els.res = {
-          invested: document.getElementById('res-invested'),
-          btc: document.getElementById('res-btc'),
-          current: document.getElementById('res-current'),
-          roi: document.getElementById('res-roi'),
-          avgPrice: document.getElementById('res-avg-price'),
-          currentPrice: document.getElementById('res-current-price')
-        };
-        els.chartCanvas = document.getElementById('hodlChart');
-        
-        // Valida elementos críticos
-        if (!els.btn || !els.chartCanvas) {
-          console.error('Simulador HODL: elementos críticos não encontrados');
-          return;
-        }
-        
-        CONFIG.initialized = true;
-        
-        // Carrega parâmetros salvos
-        loadParams();
-        
-        // Bind de eventos
-        els.btn.addEventListener('click', function() { calculate(false); });
-        ['amount','currency','frequency','days'].forEach(function(id) {
-          if (els[id]) {
-            els[id].addEventListener('change', saveParams);
-          }
-        });
-        
-        // Auto-calcular se tiver cache válido
-        if (hasValidCache()) {
-          setTimeout(function() { calculate(true); }, 300);
-        }
-      }
-
-      // ===== CACHE =====
-      function getCacheKey(currency, days) {
-        return currency + '_' + days;
-      }
-
-      function getCache(currency, days) {
-        try {
-          var raw = localStorage.getItem(CONFIG.cacheKey);
-          if (!raw) return null;
-          var cache = JSON.parse(raw);
-          var key = getCacheKey(currency, days);
-          var entry = cache[key];
-          if (entry && (Date.now() - entry.t) < CONFIG.cacheExpiry) {
-            return entry.d;
-          }
-        } catch(e) {}
-        return null;
-      }
-
-      function setCache(currency, days, data) {
-        try {
-          var cache = {};
-          try { cache = JSON.parse(localStorage.getItem(CONFIG.cacheKey) || '{}'); } catch(_) {}
-          cache[getCacheKey(currency, days)] = { d: data, t: Date.now() };
-          
-          // Limpeza: mantém só 5 entradas
-          var keys = Object.keys(cache);
-          if (keys.length > 5) {
-            keys.sort(function(a,b) { return cache[a].t - cache[b].t; })
-                .slice(0, -5)
-                .forEach(function(k) { delete cache[k]; });
-          }
-          localStorage.setItem(CONFIG.cacheKey, JSON.stringify(cache));
-        } catch(e) {
-          try { localStorage.removeItem(CONFIG.cacheKey); } catch(_) {}
-        }
-      }
-
-      function hasValidCache() {
-        if (!els.currency || !els.days) return false;
-        return !!getCache(els.currency.value, els.days.value);
-      }
-
-      // ===== PARÂMETROS =====
-      function saveParams() {
-        if (!els.amount) return;
-        var p = {
-          amount: parseFloat(els.amount.value) || 100,
-          currency: els.currency.value,
-          frequency: els.frequency.value,
-          days: parseInt(els.days.value, 10) || 1825,
-          t: Date.now()
-        };
-        localStorage.setItem(CONFIG.storageKey, JSON.stringify(p));
-      }
-
-      function loadParams() {
-        try {
-          var raw = localStorage.getItem(CONFIG.storageKey);
-          if (!raw) return;
-          var p = JSON.parse(raw);
-          // Ignora se muito antigo (>30 dias)
-          if (p.t && (Date.now() - p.t) > 30*24*60*60*1000) return;
-          if (els.amount && p.amount) els.amount.value = p.amount;
-          if (els.currency && p.currency) els.currency.value = p.currency;
-          if (els.frequency && p.frequency) els.frequency.value = p.frequency;
-          if (els.days && p.days) els.days.value = p.days;
-        } catch(e) {}
-      }
-
-      // ===== UTILITÁRIOS =====
-      function fmtMoney(v, c) {
-        if (v === null || v === undefined || isNaN(v)) {
-          return c === 'BRL' ? 'R$ 0' : '$0';
-        }
-        return new Intl.NumberFormat(c === 'BRL' ? 'pt-BR' : 'en-US', {
-          style: 'currency',
-          currency: c,
-          maximumFractionDigits: 0
-        }).format(v);
-      }
-
-      function fmtBTC(v) {
-        if (!v || isNaN(v)) return '0';
-        if (v >= 1) return v.toFixed(6) + ' BTC';
-        return Math.round(v * 1e8) + ' sats';
-      }
-
-      function fmtPct(v) {
-        if (v === null || v === undefined || isNaN(v)) return '+0%';
-        var sign = v >= 0 ? '+' : '';
-        return sign + Math.round(v) + '%';
-      }
-
-      function showError(msg) {
-        if (els.error) {
-          els.error.textContent = msg;
-          els.error.classList.add('active');
-          setTimeout(function() {
-            els.error.classList.remove('active');
-          }, 6000);
-        }
-      }
-
-      // ===== CÁLCULO DCA - OTIMIZADO =====
-      function calculateDCA(prices, amount, frequency) {
-        var stepMap = { daily: 1, weekly: 7, biweekly: 14, monthly: 30 };
-        var step = stepMap[frequency] || 7;
-        
-        var invested = 0;
-        var btc = 0;
-        var history = [];
-        
-        // Itera direto no array de preços (não por data)
-        for (var i = 0; i < prices.length; i += step) {
-          var p = prices[i];
-          var price = p[1];
-          if (!price || price <= 0) continue;
-          
-          invested += amount;
-          btc += amount / price;
-          var value = btc * price;
-          
-          history.push({
-            t: p[0],
-            value: value,
-            invested: invested,
-            price: price
-          });
-        }
-        
-        var last = history.length > 0 ? history[history.length - 1] : { value: 0, price: 0 };
-        var avg = btc > 0 ? invested / btc : 0;
-        var roi = invested > 0 ? ((last.value - invested) / invested) * 100 : 0;
-        
-        return {
-          history: history,
-          invested: invested,
-          btc: btc,
-          currentValue: last.value,
-          currentPrice: last.price,
-          avgPrice: avg,
-          roi: roi
-        };
-      }
-
-      // ===== API COINGECKO - ENDPOINT LEVE =====
-      function fetchPrices(currency, days) {
-        var url = CONFIG.apiBase + '/coins/' + CONFIG.coinId + 
-                  '/market_chart?vs_currency=' + currency.toLowerCase() + 
-                  '&days=' + days + '&interval=daily';
-        
-        return fetch(url, { cache: 'force-cache' })
-          .then(function(res) {
-            if (!res.ok) {
-              if (res.status === 429) throw new Error('RATE_LIMIT');
-              throw new Error('API ' + res.status);
-            }
-            return res.json();
-          })
-          .then(function(data) {
-            if (!data.prices || !Array.isArray(data.prices) || data.prices.length < 10) {
-              throw new Error('Dados insuficientes');
-            }
-            return data.prices;
-          });
-      }
-
-      // ===== FUNÇÃO PRINCIPAL =====
-      function calculate(skipIfCached) {
-        if (!CONFIG.initialized) {
-          init();
-          if (!CONFIG.initialized) return;
-        }
-        
-        var amount = parseFloat(els.amount.value) || 0;
-        var currency = els.currency.value;
-        var frequency = els.frequency.value;
-        var days = parseInt(els.days.value, 10) || 1825;
-        
-        if (amount <= 0) {
-          showError('Insira um valor válido');
-          return;
-        }
-        
-        // UI: loading
-        if (els.loading) els.loading.classList.add('active');
-        if (els.results) els.results.style.display = 'none';
-        if (els.btn) els.btn.disabled = true;
-        if (els.error) els.error.classList.remove('active');
-        
-        // Tenta cache primeiro
-        var cached = getCache(currency, days);
-        var fromCache = !!cached;
-        
-        var promise = fromCache 
-          ? Promise.resolve(cached)
-          : fetchPrices(currency, days);
-        
-        promise
-          .then(function(prices) {
-            // Salva cache se veio da API
-            if (!fromCache) {
-              setCache(currency, days, prices);
-            }
-            
-            // Se skipIfCached e já tínhamos cache, não atualiza UI
-            if (fromCache && skipIfCached) {
-              if (els.loading) els.loading.classList.remove('active');
-              if (els.btn) els.btn.disabled = false;
-              return;
-            }
-            
-            // Calcula simulação
-            var sim = calculateDCA(prices, amount, frequency);
-            
-            // Atualiza resultados
-            updateResults(sim, currency);
-            if (els.results) els.results.style.display = 'grid';
-            
-            // Renderiza gráfico com pequeno delay (melhora UX)
-            setTimeout(function() {
-              renderChart(sim, currency);
-            }, 80);
-            
-            saveParams();
-          })
-          .catch(function(err) {
-            console.error('Simulador HODL erro:', err);
-            if (err.message === 'RATE_LIMIT') {
-              showError('Aguarde 1-2 min e tente novamente');
-            } else if (err.message.indexOf('Failed to fetch') !== -1) {
-              showError('Erro de conexão. Verifique sua internet.');
-            } else {
-              showError('Erro ao carregar dados. Tente outro período.');
-            }
-          })
-          .finally(function() {
-            if (els.loading) els.loading.classList.remove('active');
-            if (els.btn) els.btn.disabled = false;
-          });
-      }
-
-      function updateResults(sim, currency) {
-        if (!els.res) return;
-        els.res.invested.textContent = fmtMoney(sim.invested, currency);
-        els.res.btc.textContent = fmtBTC(sim.btc);
-        els.res.current.textContent = fmtMoney(sim.currentValue, currency);
-        els.res.roi.textContent = fmtPct(sim.roi);
-        els.res.roi.className = 'value ' + (sim.roi >= 0 ? 'positive' : 'negative');
-        els.res.avgPrice.textContent = fmtMoney(sim.avgPrice, currency);
-        els.res.currentPrice.textContent = fmtMoney(sim.currentPrice, currency);
-      }
-
-      // ===== GRÁFICO - SINTAXE VALIDADA =====
-      function renderChart(sim, currency) {
-        if (!sim.history || sim.history.length === 0) return;
-        if (!els.chartCanvas) return;
-        
-        // Destroi gráfico anterior
-        if (CONFIG.chart) {
-          CONFIG.chart.destroy();
-          CONFIG.chart = null;
-        }
-        
-        // Downsampling: limita a 150 pontos
-        var data = sim.history;
-        var step = Math.max(1, Math.floor(data.length / CONFIG.maxChartPoints));
-        var chartData = [];
-        for (var i = 0; i < data.length; i += step) {
-          chartData.push(data[i]);
-        }
-        // Garante último ponto
-        if (chartData.length === 0 || chartData[chartData.length - 1] !== data[data.length - 1]) {
-          chartData.push(data[data.length - 1]);
-        }
-        
-        // Labels formatadas
-        var labels = chartData.map(function(h) {
-          var d = new Date(h.t);
-          return d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
-        });
-        
-        var ctx = els.chartCanvas.getContext('2d');
-        
-        // ✅ SINTAXE CORRETA DO CHART.JS (com data: {})
-        CONFIG.chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                label: 'Portfólio',
-                data: chartData.map(function(h) { return h.value; }),
-                borderColor: '#f7931a',
-                backgroundColor: 'rgba(247,147,26,0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.15,
-                pointRadius: 0,
-                pointHoverRadius: 3
-              },
-              {
-                label: 'Investido',
-                data: chartData.map(function(h) { return h.invested; }),
-                borderColor: '#555',
-                borderDash: [4, 3],
-                borderWidth: 1,
-                fill: false,
-                tension: 0.15,
-                pointRadius: 0
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 0 },
-            interaction: { mode: 'index', intersect: false },
-            scales: {
-              y: {
-                type: 'linear',
-                grid: { color: '#2a2a3a', lineWidth: 0.5 },
-                ticks: {
-                  color: '#999',
-                  font: { size: 9 },
-                  callback: function(value) {
-                    return fmtMoney(value, currency);
-                  },
-                  maxTicksLimit: 5
-                }
-              },
-              x: {
-                grid: { display: false },
-                ticks: {
-                  color: '#999',
-                  font: { size: 9 },
-                  maxTicksLimit: 6,
-                  maxRotation: 0
-                }
-              }
-            },
-            plugins: {
-              legend: {
-                display: true,
-                position: 'top',
-                labels: { 
-                  color: '#bbb', 
-                  font: { size: 10 }, 
-                  padding: 10, 
-                  usePointStyle: true 
-                }
-              },
-              tooltip: {
-                backgroundColor: '#1a1a24',
-                titleColor: '#fff',
-                bodyColor: '#ccc',
-                borderColor: '#333',
-                borderWidth: 1,
-                padding: 8,
-                callbacks: {
-                  label: function(context) {
-                    return context.dataset.label + ': ' + fmtMoney(context.parsed.y, currency);
-                  }
-                }
-              }
-            }
-          }
-        });
-      }
-
-      // ===== EXPORT PARA INTEGRAÇÃO EXTERNA =====
-      window.clubeDcaHodl = {
-        calculate: function() { calculate(false); },
-        refresh: function() {
-          if (!CONFIG.initialized) init();
-          if (CONFIG.initialized) calculate(false);
-        },
-        isReady: function() { return CONFIG.initialized; }
-      };
-
-      // ===== INICIALIZAÇÃO AO CARREGAR =====
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-      } else {
-        init();
-      }
-
-    })();
+    // Exemplo: Atualizar valores dinamicamente
+    console.log('Dashboard carregado!');
+    // Aqui você pode integrar com APIs de cotação depois
   </script>
 </body>
 </html>
