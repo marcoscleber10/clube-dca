@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clube DCA - Dashboard</title>
+    <title>Clube DCA - Bitcoin DCA Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -26,13 +27,14 @@
 
         /* Sidebar */
         .sidebar {
-            width: 260px;
+            width: 280px;
             background: linear-gradient(180deg, #1a1f3a 0%, #0f1429 100%);
             border-right: 1px solid #2a3152;
             padding: 20px 0;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
+            z-index: 1000;
         }
 
         .logo {
@@ -44,17 +46,17 @@
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%);
-            border-radius: 8px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 12px;
             font-weight: bold;
             color: #0a0e27;
-            font-size: 20px;
+            font-size: 24px;
         }
 
         .logo-text {
@@ -63,7 +65,7 @@
         }
 
         .logo-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
             color: #fff;
         }
@@ -80,35 +82,50 @@
         }
 
         .nav-item {
-            margin: 4px 0;
+            margin: 2px 0;
         }
 
         .nav-link {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: 14px 20px;
             color: #8892b0;
             text-decoration: none;
             transition: all 0.3s;
             cursor: pointer;
+            font-size: 14px;
         }
 
         .nav-link:hover, .nav-link.active {
-            background: rgba(247, 147, 26, 0.1);
+            background: rgba(247, 147, 26, 0.15);
             color: #f7931a;
-            border-left: 3px solid #f7931a;
+            border-left: 4px solid #f7931a;
         }
 
         .nav-icon {
-            width: 20px;
+            width: 24px;
             margin-right: 12px;
             text-align: center;
+            font-size: 16px;
+        }
+
+        .nav-text {
+            flex: 1;
+        }
+
+        .nav-badge {
+            background: #f7931a;
+            color: #0a0e27;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 260px;
+            margin-left: 280px;
             padding: 20px 30px;
         }
 
@@ -122,7 +139,7 @@
         }
 
         .header-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             color: #fff;
         }
@@ -136,32 +153,54 @@
         .btc-price-badge {
             background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%);
             color: #0a0e27;
-            padding: 8px 16px;
+            padding: 10px 18px;
             border-radius: 8px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #f7931a 0%, #ffab40 100%);
             color: #0a0e27;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 8px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s;
             font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(247, 147, 26, 0.4);
+        }
+
+        /* Page Sections */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Dashboard Cards */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -170,9 +209,15 @@
             background: linear-gradient(135deg, #1a1f3a 0%, #0f1429 100%);
             border: 1px solid #2a3152;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             position: relative;
             overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .card::before {
@@ -181,8 +226,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #f7931a, #ffab40);
+            height: 4px;
         }
 
         .card.total-investido::before { background: linear-gradient(90deg, #00d4aa, #00ffcc); }
@@ -197,81 +241,99 @@
             color: #8892b0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .card-value {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
         .card-subtitle {
-            font-size: 12px;
+            font-size: 13px;
             color: #8892b0;
         }
 
-        .positive {
-            color: #00d4aa;
-        }
+        .positive { color: #00d4aa; }
+        .negative { color: #ff4757; }
 
-        .negative {
-            color: #ff4757;
-        }
-
-        /* Charts Section */
-        .charts-section {
-            margin-bottom: 30px;
-        }
-
+        /* Charts */
         .chart-container {
             background: linear-gradient(135deg, #1a1f3a 0%, #0f1429 100%);
             border: 1px solid #2a3152;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
 
         .chart-title {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: #fff;
-            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .chart-subtitle {
-            font-size: 12px;
+            font-size: 13px;
             color: #8892b0;
-            margin-bottom: 20px;
+            margin-top: 4px;
+        }
+
+        .btn-filter {
+            background: rgba(247, 147, 26, 0.1);
+            border: 1px solid #f7931a;
+            color: #f7931a;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-filter:hover {
+            background: rgba(247, 147, 26, 0.2);
         }
 
         .chart-wrapper {
             position: relative;
-            height: 300px;
+            height: 350px;
         }
 
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
         }
 
         .chart-box {
             background: linear-gradient(135deg, #1a1f3a 0%, #0f1429 100%);
             border: 1px solid #2a3152;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
         }
 
         .chart-box-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
             color: #fff;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .btc-icon { color: #f7931a; }
@@ -279,38 +341,177 @@
         .sol-icon { color: #00ffa3; }
 
         .chart-box-small {
-            height: 200px;
+            height: 220px;
         }
 
         .btn-update {
-            background: rgba(247, 147, 26, 0.1);
-            border: 1px solid #f7931a;
-            color: #f7931a;
-            padding: 6px 12px;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid #00d4aa;
+            color: #00d4aa;
+            padding: 8px 16px;
             border-radius: 6px;
             font-size: 12px;
             cursor: pointer;
             float: right;
+            transition: all 0.3s;
+        }
+
+        .btn-update:hover {
+            background: rgba(0, 212, 170, 0.2);
+        }
+
+        /* Other Pages Styles */
+        .content-box {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1429 100%);
+            border: 1px solid #2a3152;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        .content-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #8892b0;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f1429;
+            border: 1px solid #2a3152;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #f7931a;
+            box-shadow: 0 0 0 3px rgba(247, 147, 26, 0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #2a3152;
+        }
+
+        .data-table th {
+            color: #8892b0;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .data-table td {
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .data-table tr:hover {
+            background: rgba(247, 147, 26, 0.05);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+        }
+
+        .status-warning {
+            background: rgba(247, 147, 26, 0.2);
+            color: #f7931a;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
             color: #8892b0;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
 
         .btn-add {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 20px;
             background: transparent;
-            border: 1px dashed #f7931a;
+            border: 2px dashed #f7931a;
             color: #f7931a;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            background: rgba(247, 147, 26, 0.1);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .info-card {
+            background: rgba(247, 147, 26, 0.05);
+            border: 1px solid #2a3152;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #8892b0;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
         }
 
         @media (max-width: 768px) {
@@ -326,6 +527,11 @@
             }
             .charts-grid {
                 grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
             }
         }
     </style>
@@ -343,75 +549,75 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a class="nav-link active">
-                        <span class="nav-icon">📊</span>
-                        Dashboard
+                    <a class="nav-link active" onclick="showPage('dashboard', this)">
+                        <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                        <span class="nav-text">Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">+</span>
-                        Compras
+                    <a class="nav-link" onclick="showPage('compras', this)">
+                        <span class="nav-icon"><i class="fas fa-plus"></i></span>
+                        <span class="nav-text">Compras</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">📈</span>
-                        Analise
+                    <a class="nav-link" onclick="showPage('analise', this)">
+                        <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
+                        <span class="nav-text">Analise</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">💎</span>
-                        Vitrine
+                    <a class="nav-link" onclick="showPage('vitrine', this)">
+                        <span class="nav-icon"><i class="fas fa-gem"></i></span>
+                        <span class="nav-text">Vitrine</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">⚙️</span>
-                        Admin
+                    <a class="nav-link" onclick="showPage('admin', this)">
+                        <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                        <span class="nav-text">Admin</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">$</span>
-                        Cotacao BTC / Taxas
+                    <a class="nav-link" onclick="showPage('cotacao', this)">
+                        <span class="nav-icon"><i class="fas fa-dollar-sign"></i></span>
+                        <span class="nav-text">Cotacao BTC / Taxas</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">📡</span>
-                        Sinais e DeFi
+                    <a class="nav-link" onclick="showPage('sinais', this)">
+                        <span class="nav-icon"><i class="fas fa-broadcast-tower"></i></span>
+                        <span class="nav-text">Sinais e DeFi</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">❤️</span>
-                        Apoiar
+                    <a class="nav-link" onclick="showPage('apoiar', this)">
+                        <span class="nav-icon"><i class="fas fa-heart"></i></span>
+                        <span class="nav-text">Apoiar</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">💰</span>
-                        PrecoJusto
+                    <a class="nav-link" onclick="showPage('precojusto', this)">
+                        <span class="nav-icon"><i class="fas fa-coins"></i></span>
+                        <span class="nav-text">PrecoJusto</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">🏊</span>
-                        Pools / DeFi
+                    <a class="nav-link" onclick="showPage('pools', this)">
+                        <span class="nav-icon"><i class="fas fa-swimming-pool"></i></span>
+                        <span class="nav-text">Pools / DeFi</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">📺</span>
-                        Streaming
+                    <a class="nav-link" onclick="showPage('streaming', this)">
+                        <span class="nav-icon"><i class="fas fa-video"></i></span>
+                        <span class="nav-text">Streaming</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">
-                        <span class="nav-icon">⭐</span>
-                        Carteira 2030
+                    <a class="nav-link" onclick="showPage('carteira2030', this)">
+                        <span class="nav-icon"><i class="fas fa-star"></i></span>
+                        <span class="nav-text">Carteira 2030</span>
                     </a>
                 </li>
             </ul>
@@ -419,58 +625,67 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <div class="header">
-                <h1 class="header-title">Dashboard</h1>
-                <div class="header-actions">
-                    <div class="btc-price-badge">BTC R$ 377.185,00</div>
-                    <button class="btn-primary">+ Registrar DCA</button>
-                </div>
-            </div>
-
-            <!-- Cards Grid -->
-            <div class="cards-grid">
-                <div class="card total-investido">
-                    <div class="card-label">Total Investido</div>
-                    <div class="card-value">R$ 600,00</div>
-                    <div class="card-subtitle">4 compras</div>
-                </div>
-
-                <div class="card btc-acumulado">
-                    <div class="card-label">BTC Acumulado</div>
-                    <div class="card-value" style="color: #f7931a;">83.788 sats</div>
-                    <div class="card-subtitle">0.00083788 BTC</div>
+            <!-- DASHBOARD PAGE -->
+            <div id="dashboard" class="page-section active">
+                <div class="header">
+                    <h1 class="header-title">Dashboard</h1>
+                    <div class="header-actions">
+                        <div class="btc-price-badge">
+                            <i class="fab fa-bitcoin"></i>
+                            BTC R$ 377.185,00
+                        </div>
+                        <button class="btn-primary" onclick="showPage('compras')">
+                            <i class="fas fa-plus"></i>
+                            Registrar DCA
+                        </button>
+                    </div>
                 </div>
 
-                <div class="card valor-atual">
-                    <div class="card-label">Valor Atual</div>
-                    <div class="card-value">R$ 316,04</div>
-                    <div class="card-subtitle">$ 63,49</div>
+                <div class="cards-grid">
+                    <div class="card total-investido">
+                        <div class="card-label"><i class="fas fa-wallet"></i> Total Investido</div>
+                        <div class="card-value">R$ 600,00</div>
+                        <div class="card-subtitle">4 compras</div>
+                    </div>
+
+                    <div class="card btc-acumulado">
+                        <div class="card-label"><i class="fab fa-bitcoin"></i> BTC Acumulado</div>
+                        <div class="card-value" style="color: #f7931a;">83.788 sats</div>
+                        <div class="card-subtitle">0.00083788 BTC</div>
+                    </div>
+
+                    <div class="card valor-atual">
+                        <div class="card-label"><i class="fas fa-chart-line"></i> Valor Atual</div>
+                        <div class="card-value">R$ 316,04</div>
+                        <div class="card-subtitle">$ 63,49</div>
+                    </div>
+
+                    <div class="card preco-medio">
+                        <div class="card-label"><i class="fas fa-calculator"></i> Preco Medio de Compra</div>
+                        <div class="card-value">R$ 716.093,00</div>
+                        <div class="card-subtitle">BTC agora: R$ 377.185,00</div>
+                    </div>
+
+                    <div class="card lucro-prejuizo">
+                        <div class="card-label"><i class="fas fa-percentage"></i> Lucro / Prejuizo</div>
+                        <div class="card-value negative">R$ -283,96</div>
+                        <div class="card-subtitle negative">-47.33%</div>
+                    </div>
+
+                    <div class="card btc-agora">
+                        <div class="card-label"><i class="fas fa-dollar-sign"></i> $ BTC Agora (USD)</div>
+                        <div class="card-value">$ 75,770.39</div>
+                        <div class="card-subtitle">USD/BRL: R$ 4,98</div>
+                    </div>
                 </div>
 
-                <div class="card preco-medio">
-                    <div class="card-label">Preco Medio de Compra</div>
-                    <div class="card-value">R$ 716.093,00</div>
-                    <div class="card-subtitle">BTC agora: R$ 377.185,00</div>
-                </div>
-
-                <div class="card lucro-prejuizo">
-                    <div class="card-label">Lucro / Prejuizo</div>
-                    <div class="card-value negative">R$ -283,96</div>
-                    <div class="card-subtitle negative">-47.33%</div>
-                </div>
-
-                <div class="card btc-agora">
-                    <div class="card-label">$ BTC Agora (USD)</div>
-                    <div class="card-value">$ 75,770.39</div>
-                    <div class="card-subtitle">USD/BRL: R$ 4,98</div>
-                </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="charts-section">
                 <div class="chart-container">
-                    <div class="chart-title">📈 Curva de Equity</div>
-                    <div class="chart-subtitle">Valor do portfolio vs Total investido</div>
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title"><i class="fas fa-chart-area"></i> Curva de Equity</div>
+                            <div class="chart-subtitle">Valor do portfolio vs Total investido</div>
+                        </div>
+                    </div>
                     <div class="chart-wrapper">
                         <canvas id="equityChart"></canvas>
                     </div>
@@ -479,7 +694,7 @@
                 <div class="charts-grid">
                     <div class="chart-box">
                         <div class="chart-box-title">
-                            <span class="btc-icon">₿</span>
+                            <span class="btc-icon"><i class="fab fa-bitcoin"></i></span>
                             Acumulo BTC
                         </div>
                         <div class="chart-subtitle">Sats acumulados mes a mes</div>
@@ -490,11 +705,11 @@
 
                     <div class="chart-box">
                         <div class="chart-box-title">
-                            📊 Resultado Mensal
+                            <i class="fas fa-chart-bar"></i> Resultado Mensal
                         </div>
                         <div class="chart-subtitle">Lucro/Prejuizo por mes (BRL)</div>
                         <div style="text-align: right; margin-bottom: 10px;">
-                            <button class="btn-update">Todos</button>
+                            <button class="btn-filter">Todos</button>
                         </div>
                         <div class="chart-box-small">
                             <canvas id="monthlyChart"></canvas>
@@ -502,66 +717,517 @@
                     </div>
                 </div>
 
-                <div class="chart-container" style="margin-top: 20px;">
-                    <div class="chart-title">📊 TWR — Retorno Ponderado pelo Tempo</div>
-                    <div class="chart-subtitle">% retorno mensal (barras) + TWR acumulado (linha)</div>
-                    <div style="text-align: right; margin-bottom: 15px;">
-                        <button class="btn-update">Todos</button>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title"><i class="fas fa-chart-line"></i> TWR — Retorno Ponderado pelo Tempo</div>
+                            <div class="chart-subtitle">% retorno mensal (barras) + TWR acumulado (linha)</div>
+                        </div>
+                        <button class="btn-filter">Todos</button>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="twrChart"></canvas>
                     </div>
                 </div>
 
-                <div class="charts-grid" style="margin-top: 20px;">
+                <div class="charts-grid">
                     <div class="chart-box">
                         <div class="chart-box-title">
-                            <span class="eth-icon">Ξ</span>
+                            <span class="eth-icon"><i class="fab fa-ethereum"></i></span>
                             Acumulo ETH
                         </div>
                         <div class="chart-subtitle">ETH acumulado mes a mes</div>
                         <div style="text-align: right; margin-bottom: 10px;">
-                            <button class="btn-update">Atualizar</button>
+                            <button class="btn-update"><i class="fas fa-sync"></i> Atualizar</button>
                         </div>
                         <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fab fa-ethereum"></i></div>
                             <p>Registre compras com ativo ETH para ver o grafico</p>
-                            <button class="btn-add">+ ETH</button>
+                            <button class="btn-add" onclick="showPage('compras')">
+                                <i class="fas fa-plus"></i> Adicionar ETH
+                            </button>
                         </div>
                     </div>
 
                     <div class="chart-box">
                         <div class="chart-box-title">
-                            <span class="sol-icon">◎</span>
+                            <span class="sol-icon"><i class="fas fa-sun"></i></span>
                             Acumulo SOL
                         </div>
                         <div class="chart-subtitle">SOL acumulado mes a mes</div>
                         <div style="text-align: right; margin-bottom: 10px;">
-                            <button class="btn-update">Atualizar</button>
+                            <button class="btn-update"><i class="fas fa-sync"></i> Atualizar</button>
                         </div>
                         <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-sun"></i></div>
                             <p>Registre compras com ativo SOL para ver o grafico</p>
-                            <button class="btn-add">+ SOL</button>
+                            <button class="btn-add" onclick="showPage('compras')">
+                                <i class="fas fa-plus"></i> Adicionar SOL
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- COMPRAS PAGE -->
+            <div id="compras" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-plus"></i> Registrar Compras</h1>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-plus-circle"></i> Nova Compra DCA</div>
+                    <form>
+                        <div class="form-group">
+                            <label class="form-label">Ativo</label>
+                            <select class="form-input">
+                                <option>BTC - Bitcoin</option>
+                                <option>ETH - Ethereum</option>
+                                <option>SOL - Solana</option>
+                                <option>BRZ - Brazilian Real Token</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valor Investido (R$)</label>
+                            <input type="number" class="form-input" placeholder="0,00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Quantidade</label>
+                            <input type="number" class="form-input" placeholder="0.00000000" step="0.00000001">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data da Compra</label>
+                            <input type="date" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-input" rows="3" placeholder="Opcional"></textarea>
+                        </div>
+                        <button type="button" class="btn-primary" style="width: 100%; justify-content: center;">
+                            <i class="fas fa-save"></i> Salvar Compra
+                        </button>
+                    </form>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-list"></i> Histórico de Compras</div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Ativo</th>
+                                    <th>Valor</th>
+                                    <th>Quantidade</th>
+                                    <th>Preço Médio</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15/03/2026</td>
+                                    <td><i class="fab fa-bitcoin" style="color: #f7931a;"></i> BTC</td>
+                                    <td>R$ 150,00</td>
+                                    <td>0.00039788</td>
+                                    <td>R$ 377.185,00</td>
+                                    <td><span class="status-badge status-success">Confirmado</span></td>
+                                </tr>
+                                <tr>
+                                    <td>15/02/2026</td>
+                                    <td><i class="fab fa-bitcoin" style="color: #f7931a;"></i> BTC</td>
+                                    <td>R$ 150,00</td>
+                                    <td>0.00021000</td>
+                                    <td>R$ 714.285,00</td>
+                                    <td><span class="status-badge status-success">Confirmado</span></td>
+                                </tr>
+                                <tr>
+                                    <td>15/01/2026</td>
+                                    <td><i class="fab fa-bitcoin" style="color: #f7931a;"></i> BTC</td>
+                                    <td>R$ 150,00</td>
+                                    <td>0.00015000</td>
+                                    <td>R$ 1.000.000,00</td>
+                                    <td><span class="status-badge status-success">Confirmado</span></td>
+                                </tr>
+                                <tr>
+                                    <td>15/12/2025</td>
+                                    <td><i class="fab fa-bitcoin" style="color: #f7931a;"></i> BTC</td>
+                                    <td>R$ 150,00</td>
+                                    <td>0.00008000</td>
+                                    <td>R$ 1.875.000,00</td>
+                                    <td><span class="status-badge status-success">Confirmado</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALISE PAGE -->
+            <div id="analise" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-chart-bar"></i> Análise de Performance</h1>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Sharpe Ratio</div>
+                        <div class="info-value positive">1.45</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Max Drawdown</div>
+                        <div class="info-value negative">-47.33%</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Volatilidade</div>
+                        <div class="info-value">32.5%</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Retorno Anual</div>
+                        <div class="info-value negative">-47.33%</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title"><i class="fas fa-chart-line"></i> Análise Técnica</div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="analysisChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VITRINE PAGE -->
+            <div id="vitrine" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-gem"></i> Vitrine de Projetos</h1>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-label"><i class="fas fa-rocket"></i> Projeto em Destaque</div>
+                        <div class="card-value" style="font-size: 20px;">Bitcoin ETF</div>
+                        <div class="card-subtitle">Aprovado nos EUA em 2024</div>
+                        <button class="btn-primary" style="margin-top: 15px; width: 100%;">
+                            <i class="fas fa-external-link-alt"></i> Saiba Mais
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-label"><i class="fas fa-lightbulb"></i> Dica do Dia</div>
+                        <div class="card-value" style="font-size: 18px;">DCA Semanal</div>
+                        <div class="card-subtitle">Compre toda semana para reduzir volatilidade</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN PAGE -->
+            <div id="admin" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-cog"></i> Painel Administrativo</h1>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-user-cog"></i> Configurações</div>
+                    <div class="form-group">
+                        <label class="form-label">Nome do Usuário</label>
+                        <input type="text" class="form-input" value="Marcos">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" value="marcos@clubedca.com">
+                    </div>
+                    <button class="btn-primary">
+                        <i class="fas fa-save"></i> Salvar Configurações
+                    </button>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-database"></i> Backup de Dados</div>
+                    <button class="btn-primary" style="margin-right: 10px;">
+                        <i class="fas fa-download"></i> Exportar Dados
+                    </button>
+                    <button class="btn-primary" style="background: linear-gradient(135deg, #ff4757 0%, #ff6b7a 100%); color: white;">
+                        <i class="fas fa-upload"></i> Importar Dados
+                    </button>
+                </div>
+            </div>
+
+            <!-- COTACAO PAGE -->
+            <div id="cotacao" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-dollar-sign"></i> Cotações e Taxas</h1>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-label"><i class="fab fa-bitcoin"></i> Bitcoin (BTC)</div>
+                        <div class="card-value">R$ 377.185,00</div>
+                        <div class="card-subtitle positive">+2.34% (24h)</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label"><i class="fab fa-ethereum"></i> Ethereum (ETH)</div>
+                        <div class="card-value">R$ 12.450,00</div>
+                        <div class="card-subtitle positive">+1.87% (24h)</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label"><i class="fas fa-dollar-sign"></i> USD/BRL</div>
+                        <div class="card-value">R$ 4,98</div>
+                        <div class="card-subtitle negative">-0.12% (24h)</div>
+                    </div>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-percentage"></i> Taxas das Exchanges</div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Exchange</th>
+                                    <th>Taxa Maker</th>
+                                    <th>Taxa Taker</th>
+                                    <th>Withdrawal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Binance</td>
+                                    <td>0.10%</td>
+                                    <td>0.10%</td>
+                                    <td>R$ 15,00</td>
+                                </tr>
+                                <tr>
+                                    <td>Mercado Bitcoin</td>
+                                    <td>0.30%</td>
+                                    <td>0.70%</td>
+                                    <td>R$ 20,00</td>
+                                </tr>
+                                <tr>
+                                    <td>Foxbit</td>
+                                    <td>0.25%</td>
+                                    <td>0.75%</td>
+                                    <td>R$ 18,00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SINAIS PAGE -->
+            <div id="sinais" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-broadcast-tower"></i> Sinais e DeFi</h1>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-signal"></i> Sinais de Trading</div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-broadcast-tower"></i></div>
+                        <p>Nenhum sinal ativo no momento</p>
+                        <p style="font-size: 13px; margin-top: 10px;">Os sinais aparecerão aqui quando disponíveis</p>
+                    </div>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-hand-holding-usd"></i> Oportunidades DeFi</div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="info-label">Staking ETH</div>
+                            <div class="info-value positive">4.5% APY</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">Liquidity Pool</div>
+                            <div class="info-value positive">12.3% APY</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APOIAR PAGE -->
+            <div id="apoiar" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-heart"></i> Apoiar o Projeto</h1>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-coffee"></i> Faça uma Doação</div>
+                    <p style="color: #8892b0; margin-bottom: 20px;">
+                        Se você gosta do Clube DCA e quer ajudar a manter o projeto no ar, considere fazer uma doação:
+                    </p>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fab fa-bitcoin" style="color: #f7931a;"></i> Bitcoin (BTC)</label>
+                        <div style="background: #0f1429; padding: 15px; border-radius: 8px; border: 1px solid #2a3152; font-family: monospace; word-break: break-all;">
+                            bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label"><i class="fab fa-ethereum" style="color: #627eea;"></i> Ethereum (ETH)</label>
+                        <div style="background: #0f1429; padding: 15px; border-radius: 8px; border: 1px solid #2a3152; font-family: monospace; word-break: break-all;">
+                            0x71C7656EC7ab88b098defB751B7401B5f6d8976F
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" style="margin-top: 20px;">
+                        <i class="fas fa-copy"></i> Copiar Endereço BTC
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRECO JUSTO PAGE -->
+            <div id="precojusto" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-coins"></i> Preço Justo Bitcoin</h1>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Preço Atual</div>
+                        <div class="info-value">R$ 377.185</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Preço Justo (Mayer Multiple)</div>
+                        <div class="info-value positive">R$ 425.000</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Status</div>
+                        <div class="info-value negative" style="font-size: 18px;">Subvalorizado</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title"><i class="fas fa-chart-line"></i> Histórico Preço Justo</div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="fairValueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POOLS PAGE -->
+            <div id="pools" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-swimming-pool"></i> Pools de Liquidez / DeFi</h1>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-label"><i class="fas fa-water"></i> Uniswap ETH/USDC</div>
+                        <div class="card-value" style="font-size: 20px;">APY 15.3%</div>
+                        <div class="card-subtitle">TVL: $245M</div>
+                        <button class="btn-primary" style="margin-top: 15px; width: 100%;">
+                            <i class="fas fa-external-link-alt"></i> Acessar Pool
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-label"><i class="fas fa-water"></i> Curve 3pool</div>
+                        <div class="card-value" style="font-size: 20px;">APY 8.7%</div>
+                        <div class="card-subtitle">TVL: $1.2B</div>
+                        <button class="btn-primary" style="margin-top: 15px; width: 100%;">
+                            <i class="fas fa-external-link-alt"></i> Acessar Pool
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STREAMING PAGE -->
+            <div id="streaming" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-video"></i> Streaming e Lives</h1>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-play-circle"></i> Próxima Live</div>
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-video"></i></div>
+                        <p>Nenhuma live agendada no momento</p>
+                        <p style="font-size: 13px; margin-top: 10px;">Acompanhe nosso canal para não perder as próximas análises!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARTEIRA 2030 PAGE -->
+            <div id="carteira2030" class="page-section">
+                <div class="header">
+                    <h1 class="header-title"><i class="fas fa-star"></i> Carteira 2030</h1>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Meta para 2030</div>
+                        <div class="info-value">1 BTC</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Acumulado</div>
+                        <div class="info-value" style="color: #f7931a;">0.00083788 BTC</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Progresso</div>
+                        <div class="info-value negative">0.08%</div>
+                    </div>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-title"><i class="fas fa-bullseye"></i> Projeção</div>
+                    <p style="color: #8892b0; margin-bottom: 20px;">
+                        Mantendo o DCA mensal de R$ 150,00, você terá acumulado aproximadamente:
+                    </p>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-label">Em 2027</div>
+                            <div class="card-value" style="font-size: 24px;">0.015 BTC</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-label">Em 2030</div>
+                            <div class="card-value" style="font-size: 24px;">0.054 BTC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
     <script>
-        // Chart.js default config
+        // Page Navigation
+        function showPage(pageId, element) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-section');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+
+            // Update active nav link
+            if (element) {
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+                element.classList.add('active');
+            }
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Initialize Charts
         Chart.defaults.color = '#8892b0';
         Chart.defaults.borderColor = '#2a3152';
 
         // Equity Chart
         const equityCtx = document.getElementById('equityChart').getContext('2d');
-        const equityGradient = equityCtx.createLinearGradient(0, 0, 0, 300);
-        equityGradient.addColorStop(0, 'rgba(247, 147, 26, 0.3)');
-        equityGradient.addColorStop(1, 'rgba(247, 147, 26, 0.0)');
+        const equityGradient1 = equityCtx.createLinearGradient(0, 0, 0, 350);
+        equityGradient1.addColorStop(0, 'rgba(0, 212, 170, 0.3)');
+        equityGradient1.addColorStop(1, 'rgba(0, 212, 170, 0.0)');
 
-        const equityGradient2 = equityCtx.createLinearGradient(0, 0, 0, 300);
-        equityGradient2.addColorStop(0, 'rgba(0, 212, 170, 0.3)');
-        equityGradient2.addColorStop(1, 'rgba(0, 212, 170, 0.0)');
+        const equityGradient2 = equityCtx.createLinearGradient(0, 0, 0, 350);
+        equityGradient2.addColorStop(0, 'rgba(247, 147, 26, 0.3)');
+        equityGradient2.addColorStop(1, 'rgba(247, 147, 26, 0.0)');
 
         new Chart(equityCtx, {
             type: 'line',
@@ -571,14 +1237,14 @@
                     label: 'Valor do Portfolio',
                     data: [200, 210, 250, 316],
                     borderColor: '#00d4aa',
-                    backgroundColor: equityGradient2,
+                    backgroundColor: equityGradient1,
                     fill: true,
                     tension: 0.4
                 }, {
                     label: 'Total Investido',
                     data: [200, 300, 450, 600],
                     borderColor: '#f7931a',
-                    backgroundColor: equityGradient,
+                    backgroundColor: equityGradient2,
                     borderDash: [5, 5],
                     fill: true,
                     tension: 0.4
@@ -590,12 +1256,16 @@
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'top'
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
+                        beginAtZero: false,
                         ticks: {
                             callback: function(value) {
                                 return 'R$' + value;
@@ -672,6 +1342,7 @@
                     label: 'TWR Acumulado %',
                     data: [0, -2, 1.5],
                     borderColor: '#627eea',
+                    backgroundColor: '#627eea',
                     tension: 0.4
                 }, {
                     type: 'bar',
@@ -695,6 +1366,61 @@
                 scales: {
                     y: {
                         beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        // Analysis Chart
+        const analysisCtx = document.getElementById('analysisChart').getContext('2d');
+        new Chart(analysisCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Performance',
+                    data: [-10, -15, -25, -35, -42, -47.33],
+                    borderColor: '#ff4757',
+                    backgroundColor: 'rgba(255, 71, 87, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // Fair Value Chart
+        const fairValueCtx = document.getElementById('fairValueChart').getContext('2d');
+        new Chart(fairValueCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Preço Atual',
+                    data: [350000, 360000, 370000, 375000, 377000, 377185],
+                    borderColor: '#f7931a',
+                    tension: 0.4
+                }, {
+                    label: 'Preço Justo',
+                    data: [400000, 410000, 415000, 420000, 423000, 425000],
+                    borderColor: '#00d4aa',
+                    borderDash: [5, 5],
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
                     }
                 }
             }
